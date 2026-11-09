@@ -48,6 +48,23 @@ describe.each(SAMPLE_RATES)('detectPitchMpm at %i Hz', (sampleRate) => {
   });
 });
 
+describe.each(SAMPLE_RATES)('tuner range at %i Hz', (sampleRate) => {
+  const options = { sampleRate, minFrequency: 50 };
+  const windowSize = 3072;
+
+  it.each([36, 37, 38, ...OPEN_STRINGS])('finds guitar-like harmonics at MIDI %i', (midi) => {
+    const result = detectPitchMpm(guitarLike(midiToHz(midi), sampleRate, windowSize), options);
+    expect(result).not.toBeNull();
+    expect(Math.abs(centsBetween(result!.frequency, midiToHz(midi)))).toBeLessThan(5);
+  });
+
+  it('reads a slack string below Drop C', () => {
+    const result = detectPitchMpm(guitarLike(58, sampleRate, windowSize), options);
+    expect(result).not.toBeNull();
+    expect(Math.abs(centsBetween(result!.frequency, 58))).toBeLessThan(5);
+  });
+});
+
 describe('octave-error guarding', () => {
   const sampleRate = 48000;
   const windowSize = 3072;

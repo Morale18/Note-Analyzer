@@ -5,10 +5,13 @@ import { EarPage } from './pages/EarPage';
 import { PracticePage } from './pages/PracticePage';
 import { SettingsPage } from './pages/SettingsPage';
 import { StatsPage } from './pages/StatsPage';
+import { TunerPage } from './pages/TunerPage';
 
 function pageFromHash(): Page {
   const hash = window.location.hash.replace('#/', '').split('/')[0];
-  return hash === 'ear' || hash === 'settings' || hash === 'stats' ? hash : 'practice';
+  return hash === 'ear' || hash === 'tuner' || hash === 'settings' || hash === 'stats'
+    ? hash
+    : 'practice';
 }
 
 export function App() {
@@ -27,6 +30,7 @@ export function App() {
       <main className="page">
         {page === 'practice' && <PracticePage />}
         {page === 'ear' && <EarPage />}
+        {page === 'tuner' && <TunerPage />}
         {page === 'settings' && <SettingsPage />}
         {page === 'stats' && <StatsPage />}
       </main>

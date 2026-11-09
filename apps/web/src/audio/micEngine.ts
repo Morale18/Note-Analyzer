@@ -1,4 +1,4 @@
-import type { AudioFrame } from './frame';
+import type { AudioFrame, PitchProcessorOptions } from './frame';
 import processorUrl from './pitchProcessor.ts?worker&url';
 
 export class MicError extends Error {}
@@ -22,7 +22,10 @@ export class MicEngine {
    * it's created and resumed inside the gesture, so that happens before any await.
    * Resolves false if `stop` was called while starting.
    */
-  async start(onFrame: (frame: AudioFrame) => void): Promise<boolean> {
+  async start(
+    onFrame: (frame: AudioFrame) => void,
+    detectorOptions?: PitchProcessorOptions,
+  ): Promise<boolean> {
     this.stop();
     if (!navigator.mediaDevices?.getUserMedia) {
       throw new MicError(
@@ -51,6 +54,7 @@ export class MicEngine {
         numberOfInputs: 1,
         numberOfOutputs: 1,
         outputChannelCount: [1],
+        processorOptions: detectorOptions,
       });
       node.port.onmessage = (event: MessageEvent<AudioFrame>) => onFrame(event.data);
       this.node = node;

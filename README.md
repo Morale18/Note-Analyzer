@@ -64,6 +64,12 @@ It has its own Strings, Notes, and Fret range in the **Ear training** part of **
 
 On iPhone, the silent switch mutes the notes.
 
+## Tuner
+
+The **Tuner** tab walks you through the strings from lowest to highest. Pick a tuning, tap **Start**, and pluck the highlighted string. The gauge and the message under it show whether to tighten or loosen the string and how far off you are. Once the string holds within 5 cents for half a second, it's checked off and the tuner moves to the next one, until all six are in tune.
+
+Tap any string to jump to it or retune it. Turn **Auto** off to stay on one string after it's in tune and choose the next yourself. The back arrow stops the tuner. The tunings are Standard, Drop D, Half step down, Drop C♯, Whole step down, Drop C, DADGAD, and Open G, D, A, E and C. The app remembers the last one you used on that device. It uses the same microphone sensitivity as Practice.
+
 ## Tune detection sensitivity
 
 The sensitivity slider in **Settings** sets the noise gate: how loud a sound must be before it counts as a note.

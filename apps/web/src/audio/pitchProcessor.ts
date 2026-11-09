@@ -1,5 +1,5 @@
 import { createMpmDetector, rms, type PitchDetector } from '@fretboard/dsp';
-import type { AudioFrame } from './frame';
+import type { AudioFrame, PitchProcessorOptions } from './frame';
 
 // Globals of AudioWorkletGlobalScope, which TypeScript's DOM lib doesn't describe.
 declare const sampleRate: number;
@@ -12,12 +12,19 @@ declare class AudioWorkletProcessor {
 const HOP_SIZE = 1024;
 
 class PitchProcessor extends AudioWorkletProcessor {
-  private readonly detector: PitchDetector = createMpmDetector({ sampleRate });
-  private readonly ring = new Float32Array(this.detector.windowSize);
-  private readonly window = new Float32Array(this.detector.windowSize);
+  private readonly detector: PitchDetector;
+  private readonly ring: Float32Array;
+  private readonly window: Float32Array;
   private writeIndex = 0;
   private filled = 0;
   private samplesSinceAnalysis = 0;
+
+  constructor(options: { processorOptions?: PitchProcessorOptions }) {
+    super();
+    this.detector = createMpmDetector({ sampleRate, ...options.processorOptions });
+    this.ring = new Float32Array(this.detector.windowSize);
+    this.window = new Float32Array(this.detector.windowSize);
+  }
 
   process(inputs: Float32Array[][]): boolean {
     const channel = inputs[0]?.[0];

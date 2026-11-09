@@ -40,8 +40,12 @@ export function pitchClassName(pitchClass: number, style: AccidentalStyle = 'sha
   return names[midiToPitchClass(pitchClass)];
 }
 
+/** Scientific pitch octave, e.g. MIDI 66 → 4. */
+export function midiOctave(midi: number): number {
+  return Math.floor(midi / 12) - 1;
+}
+
 /** Scientific pitch name, e.g. MIDI 66 → "F♯4". */
 export function midiToNoteName(midi: number, style: AccidentalStyle = 'sharps'): string {
-  const octave = Math.floor(midi / 12) - 1;
-  return `${pitchClassName(midi, style)}${octave}`;
+  return `${pitchClassName(midi, style)}${midiOctave(midi)}`;
 }
