@@ -6,9 +6,11 @@ import {
   STRING_LABELS,
   pitchClassName,
   validateSetup,
+  type AccidentalStyle,
+  type EarSetup,
   type SettingsInput,
 } from '@fretboard/shared';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useSettings } from '../settings';
 
 function toggled(values: readonly number[], value: number): number[] {
@@ -61,42 +63,36 @@ function Section(props: { title: string; children: ReactNode }) {
   );
 }
 
-export function SettingsPage() {
-  const { settings, saveSettings } = useSettings();
-  const [draft, setDraft] = useState(settings);
-
-  useEffect(() => setDraft(settings), [settings]);
-
-  const errors = validateSetup(draft);
-
-  function update(patch: Partial<SettingsInput>) {
-    const next = { ...draft, ...patch };
-    setDraft(next);
-    if (validateSetup(next).length === 0) saveSettings(next);
-  }
-
+function SetupErrors({ setup }: { setup: EarSetup }) {
+  const errors = validateSetup(setup);
+  if (errors.length === 0) return null;
   return (
-    <div className="settings">
-      <h1>Settings</h1>
+    <div className="error-message" role="alert">
+      {errors.map((message) => (
+        <p key={message}>{message}</p>
+      ))}
+      <p className="error-hint">Until this is fixed, your last valid setup stays in use.</p>
+    </div>
+  );
+}
 
-      {errors.length > 0 && (
-        <div className="error-message" role="alert">
-          {errors.map((message) => (
-            <p key={message}>{message}</p>
-          ))}
-          <p className="error-hint">Until this is fixed, practice uses your last valid setup.</p>
-        </div>
-      )}
-
+function SetupFields(props: {
+  setup: EarSetup;
+  accidentalStyle: AccidentalStyle;
+  onChange: (patch: Partial<EarSetup>) => void;
+}) {
+  const { setup, accidentalStyle, onChange } = props;
+  return (
+    <>
       <Section title="Strings">
         <div className="chip-grid chip-grid-3">
           {ALL_STRINGS.map((stringIndex) => (
             <Chip
               key={stringIndex}
               label={STRING_LABELS[stringIndex]!}
-              checked={draft.selectedStrings.includes(stringIndex)}
+              checked={setup.selectedStrings.includes(stringIndex)}
               onChange={() =>
-                update({ selectedStrings: toggled(draft.selectedStrings, stringIndex) })
+                onChange({ selectedStrings: toggled(setup.selectedStrings, stringIndex) })
               }
             />
           ))}
@@ -105,13 +101,16 @@ export function SettingsPage() {
 
       <Section title="Notes">
         <div className="button-row">
-          <button className="button" onClick={() => update({ selectedNotes: [...NATURAL_NOTES] })}>
+          <button
+            className="button"
+            onClick={() => onChange({ selectedNotes: [...NATURAL_NOTES] })}
+          >
             Naturals only
           </button>
-          <button className="button" onClick={() => update({ selectedNotes: [...ALL_NOTES] })}>
+          <button className="button" onClick={() => onChange({ selectedNotes: [...ALL_NOTES] })}>
             All 12
           </button>
-          <button className="button" onClick={() => update({ selectedNotes: [] })}>
+          <button className="button" onClick={() => onChange({ selectedNotes: [] })}>
             Clear
           </button>
         </div>
@@ -119,9 +118,9 @@ export function SettingsPage() {
           {ALL_NOTES.map((note) => (
             <Chip
               key={note}
-              label={pitchClassName(note, draft.accidentalStyle)}
-              checked={draft.selectedNotes.includes(note)}
-              onChange={() => update({ selectedNotes: toggled(draft.selectedNotes, note) })}
+              label={pitchClassName(note, accidentalStyle)}
+              checked={setup.selectedNotes.includes(note)}
+              onChange={() => onChange({ selectedNotes: toggled(setup.selectedNotes, note) })}
             />
           ))}
         </div>
@@ -131,16 +130,45 @@ export function SettingsPage() {
         <div className="stepper-row">
           <Stepper
             label="Lowest"
-            value={draft.fretMin}
-            onChange={(fretMin) => update({ fretMin })}
+            value={setup.fretMin}
+            onChange={(fretMin) => onChange({ fretMin })}
           />
           <Stepper
             label="Highest"
-            value={draft.fretMax}
-            onChange={(fretMax) => update({ fretMax })}
+            value={setup.fretMax}
+            onChange={(fretMax) => onChange({ fretMax })}
           />
         </div>
       </Section>
+    </>
+  );
+}
+
+export function SettingsPage() {
+  const { settings, saveSettings } = useSettings();
+  const [draft, setDraft] = useState(settings);
+  const earSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => setDraft(settings), [settings]);
+
+  useEffect(() => {
+    if (window.location.hash === '#/settings/ear') earSectionRef.current?.scrollIntoView();
+  }, []);
+
+  function update(patch: Partial<SettingsInput>) {
+    const next = { ...draft, ...patch };
+    setDraft(next);
+    if (validateSetup(next).length === 0 && validateSetup(next.ear).length === 0) {
+      saveSettings(next);
+    }
+  }
+
+  return (
+    <div className="settings">
+      <h1>Settings</h1>
+
+      <SetupErrors setup={draft} />
+      <SetupFields setup={draft} accidentalStyle={draft.accidentalStyle} onChange={update} />
 
       <Section title="Note names">
         <div className="segmented">
@@ -188,6 +216,17 @@ export function SettingsPage() {
           <span>Weight toward weak notes</span>
         </label>
       </Section>
+
+      <div className="settings-group" ref={earSectionRef}>
+        <h1>Ear training</h1>
+        <p className="hint">These only change the Ear tab. Practice uses the settings above.</p>
+        <SetupErrors setup={draft.ear} />
+        <SetupFields
+          setup={draft.ear}
+          accidentalStyle={draft.accidentalStyle}
+          onChange={(patch) => update({ ear: { ...draft.ear, ...patch } })}
+        />
+      </div>
     </div>
   );
 }

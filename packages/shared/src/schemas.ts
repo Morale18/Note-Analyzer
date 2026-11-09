@@ -11,23 +11,39 @@ export const accidentalStyleSchema = z.enum(['sharps', 'flats']);
 
 const hasNoDuplicates = (values: number[]) => new Set(values).size === values.length;
 
-const settingsFields = {
+const setupFields = {
   selectedStrings: z.array(stringIndexSchema).refine(hasNoDuplicates, 'Duplicate strings'),
   selectedNotes: z.array(pitchClassSchema).refine(hasNoDuplicates, 'Duplicate notes'),
   fretMin: fretSchema,
   fretMax: fretSchema,
-  accidentalStyle: accidentalStyleSchema,
-  /** 0 = only loud notes register, 1 = the quietest notes register. */
-  sensitivity: z.number().min(0).max(1),
-  weightWeakNotes: z.boolean(),
 };
 
 function refineSetup(
-  setup: z.infer<z.ZodObject<typeof settingsFields>>,
+  setup: z.infer<z.ZodObject<typeof setupFields>>,
   ctx: z.RefinementCtx,
 ): void {
   for (const message of validateSetup(setup)) ctx.addIssue({ code: 'custom', message });
 }
+
+export const earSetupSchema = z.object(setupFields).superRefine(refineSetup);
+export type EarSetup = z.infer<typeof earSetupSchema>;
+
+export const DEFAULT_EAR_SETUP: EarSetup = {
+  selectedStrings: [...ALL_STRINGS],
+  selectedNotes: [...NATURAL_NOTES],
+  fretMin: 0,
+  fretMax: 12,
+};
+
+const settingsFields = {
+  ...setupFields,
+  accidentalStyle: accidentalStyleSchema,
+  /** 0 = only loud notes register, 1 = the quietest notes register. */
+  sensitivity: z.number().min(0).max(1),
+  weightWeakNotes: z.boolean(),
+  /** Defaulted because settings cached on a phone may predate it. */
+  ear: earSetupSchema.default(DEFAULT_EAR_SETUP),
+};
 
 export const settingsInputSchema = z.object(settingsFields).superRefine(refineSetup);
 export const settingsSchema = z
@@ -45,6 +61,7 @@ export const DEFAULT_SETTINGS: SettingsInput = {
   accidentalStyle: 'sharps',
   sensitivity: 0.5,
   weightWeakNotes: false,
+  ear: DEFAULT_EAR_SETUP,
 };
 
 /** Maps the 0–1 sensitivity setting to a noise-gate RMS level (0.1 down to ~0.0003). */

@@ -44,6 +44,20 @@ describe('settings schemas', () => {
     expect(settingsInputSchema.safeParse({ ...DEFAULT_SETTINGS, ...patch }).success).toBe(false);
   });
 
+  it('gives settings saved before ear training the default ear setup', () => {
+    const { ear: _ear, ...withoutEar } = DEFAULT_SETTINGS;
+    expect(settingsInputSchema.parse(withoutEar).ear).toEqual(DEFAULT_SETTINGS.ear);
+  });
+
+  it('rejects an invalid ear setup', () => {
+    const result = settingsInputSchema.safeParse({
+      ...DEFAULT_SETTINGS,
+      ear: { ...DEFAULT_SETTINGS.ear, selectedNotes: [] },
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe('Select at least one note.');
+  });
+
   it('rejects a setup with no playable notes and explains why', () => {
     const result = settingsInputSchema.safeParse({
       ...DEFAULT_SETTINGS,

@@ -73,6 +73,17 @@ describe('settings', () => {
     expect(got.updatedAt).toBeGreaterThan(0);
   });
 
+  it('saves the ear setup separately from the practice setup', async () => {
+    const ear = { ...DEFAULT_SETTINGS.ear, selectedNotes: [9], fretMax: 5 };
+    const payload = { ...DEFAULT_SETTINGS, ear };
+    await app.inject({ method: 'PUT', url: '/api/settings', payload });
+
+    const got = (await app.inject({ method: 'GET', url: '/api/settings' })).json();
+    expect(got.ear).toEqual(ear);
+    expect(got.selectedNotes).toEqual(DEFAULT_SETTINGS.selectedNotes);
+    expect(got.fretMax).toBe(DEFAULT_SETTINGS.fretMax);
+  });
+
   it('rejects an invalid setup with a useful message', async () => {
     const response = await app.inject({
       method: 'PUT',

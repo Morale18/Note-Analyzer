@@ -1,3 +1,4 @@
+import { DEFAULT_EAR_SETUP, type EarSetup } from '@fretboard/shared';
 import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 /** A single row for now, always with id = 1. */
@@ -10,6 +11,7 @@ export const settings = sqliteTable('settings', {
   accidentalStyle: text('accidental_style', { enum: ['sharps', 'flats'] }).notNull(),
   sensitivity: real('sensitivity').notNull(),
   weightWeakNotes: integer('weight_weak_notes', { mode: 'boolean' }).notNull(),
+  ear: text('ear', { mode: 'json' }).$type<EarSetup>().notNull().default(DEFAULT_EAR_SETUP),
   updatedAt: integer('updated_at').notNull(),
 });
 

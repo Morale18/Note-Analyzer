@@ -6,13 +6,9 @@ import {
 } from '@fretboard/shared';
 import { LiveReadout } from '../components/LiveReadout';
 import { SyncNotice } from '../components/SyncNotice';
-import type { Score } from '../quiz/machine';
+import { accuracyText } from '../quiz/machine';
 import { useQuiz } from '../quiz/useQuiz';
 import { useSettings } from '../settings';
-
-function accuracyText(score: Score): string {
-  return score.total === 0 ? '—' : `${Math.round((score.correct / score.total) * 100)}%`;
-}
 
 export function PracticePage() {
   const { settings } = useSettings();

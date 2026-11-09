@@ -30,7 +30,11 @@ export type QuizEvent =
 
 export const initialQuizState: QuizState = { phase: 'idle', score: EMPTY_SCORE };
 
-function applyGrade(score: Score, correct: boolean): Score {
+export function accuracyText(score: Score): string {
+  return score.total === 0 ? '—' : `${Math.round((score.correct / score.total) * 100)}%`;
+}
+
+export function applyGrade(score: Score, correct: boolean): Score {
   const streak = correct ? score.streak + 1 : 0;
   return {
     correct: score.correct + (correct ? 1 : 0),

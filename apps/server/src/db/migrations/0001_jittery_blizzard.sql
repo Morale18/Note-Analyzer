@@ -1,0 +1,1 @@
+ALTER TABLE `settings` ADD `ear` text DEFAULT '{"selectedStrings":[0,1,2,3,4,5],"selectedNotes":[0,2,4,5,7,9,11],"fretMin":0,"fretMax":12}' NOT NULL;

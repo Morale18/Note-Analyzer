@@ -376,6 +376,22 @@ ul {
   gap: 12px;
 }
 
+.ear-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.ear-option {
+  min-height: 96px;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.hint a {
+  color: var(--accent);
+}
+
 .sync-notice {
   padding: 10px 12px;
   border-radius: var(--radius);
@@ -405,6 +421,19 @@ ul {
 
 .settings-section {
   margin-bottom: 28px;
+}
+
+.settings-group {
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.settings-group h1 {
+  margin-bottom: 4px;
+}
+
+.settings-group .hint {
+  margin: 0 0 20px;
 }
 
 .chip-grid {

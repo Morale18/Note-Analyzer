@@ -1,7 +1,8 @@
-export type Page = 'practice' | 'settings' | 'stats';
+export type Page = 'practice' | 'ear' | 'settings' | 'stats';
 
 const ITEMS: { page: Page; label: string }[] = [
   { page: 'practice', label: 'Practice' },
+  { page: 'ear', label: 'Ear' },
   { page: 'settings', label: 'Settings' },
   { page: 'stats', label: 'Stats' },
 ];

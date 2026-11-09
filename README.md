@@ -56,6 +56,14 @@ This opens the app full-screen with no browser bars.
 
 The app has to be accepted over the self-signed certificate first. Some phones don't carry that acceptance over to the Home Screen version. If it won't load or can't use the microphone from there, keep using it in a browser tab, which works the same way.
 
+## Ear training
+
+The **Ear** tab plays a note and gives you three names to choose from. Right or wrong, it moves on to the next note after showing the answer; tap **Play again** to hear the note again before answering.
+
+It has its own Strings, Notes, and Fret range in the **Ear training** part of **Settings**, separate from Practice. The notes you hear are ones that setup can play. If fewer than three notes are selected, the extra choices come from the other notes. Ear training scores last for the current run and aren't added to **Stats**.
+
+On iPhone, the silent switch mutes the notes.
+
 ## Tune detection sensitivity
 
 The sensitivity slider in **Settings** sets the noise gate: how loud a sound must be before it counts as a note.
